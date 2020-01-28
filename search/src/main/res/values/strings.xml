@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">search</string>
+    <string name="call_button_label">Call</string>
+    <string name="try_again">Try Again</string>
+</resources>
