@@ -31,7 +31,10 @@ class LauncherActivity : AppCompatActivity(), PresenterView<LauncherViewModel, L
 
     override fun performAction(action: LauncherActions) {
         when (action) {
-            LauncherActions.LaunchSearch -> startActivity(Intent(this, SearchActivity::class.java))
+            LauncherActions.LaunchSearch -> {
+                startActivity(Intent(this, SearchActivity::class.java))
+                finish()
+            }
         }
     }
 

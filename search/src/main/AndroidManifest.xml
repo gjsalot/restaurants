@@ -3,7 +3,8 @@
     package="com.grantsutcliffe.restaurants.search">
 
     <application>
-        <activity android:name="com.grantsutcliffe.restaurants.search.activity.SearchActivity"></activity>
+        <activity android:name=".activity.SearchActivity"/>
+        <activity android:name=".activity.RestaurantActivity"/>
     </application>
 
 </manifest>

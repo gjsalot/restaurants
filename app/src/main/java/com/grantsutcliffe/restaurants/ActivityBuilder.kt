@@ -3,7 +3,9 @@ package com.grantsutcliffe.restaurants
 import android.app.Activity
 import com.grantsutcliffe.restaurants.launcher.activity.LauncherActivity
 import com.grantsutcliffe.restaurants.launcher.di.LauncherActivityComponent
+import com.grantsutcliffe.restaurants.search.activity.RestaurantActivity
 import com.grantsutcliffe.restaurants.search.activity.SearchActivity
+import com.grantsutcliffe.restaurants.search.di.RestaurantActivityComponent
 import com.grantsutcliffe.restaurants.search.di.SearchActivityComponent
 import dagger.android.AndroidInjector
 import dagger.android.ActivityKey
@@ -24,5 +26,10 @@ abstract class ActivityBuilder {
     @IntoMap
     @ActivityKey(SearchActivity::class)
     internal abstract fun bindSearchActivity(builder: SearchActivityComponent.Builder): AndroidInjector.Factory<out Activity>
+
+    @Binds
+    @IntoMap
+    @ActivityKey(RestaurantActivity::class)
+    internal abstract fun bindRestaurantActivity(builder: RestaurantActivityComponent.Builder): AndroidInjector.Factory<out Activity>
 
 }

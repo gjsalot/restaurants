@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.res.Resources
 import com.grantsutcliffe.restaurants.launcher.di.LauncherActivityComponent
+import com.grantsutcliffe.restaurants.search.di.RestaurantActivityComponent
 import com.grantsutcliffe.restaurants.search.di.SearchActivityComponent
 import dagger.Module
 import javax.inject.Singleton
@@ -12,7 +13,8 @@ import dagger.Provides
 
 @Module(subcomponents = [
     LauncherActivityComponent::class,
-    SearchActivityComponent::class
+    SearchActivityComponent::class,
+    RestaurantActivityComponent::class
 ])
 @Singleton
 class AppModule {

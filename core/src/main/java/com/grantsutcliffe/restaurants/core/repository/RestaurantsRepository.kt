@@ -12,4 +12,7 @@ open class RestaurantsRepository(
     open fun getRestaurants(): Observable<List<Restaurant>> = networkSource.getRestaurants()
         .toObservable()
 
+    open fun getRestaurant(id: String): Observable<Restaurant> = networkSource.getRestaurant(id)
+        .toObservable()
+
 }

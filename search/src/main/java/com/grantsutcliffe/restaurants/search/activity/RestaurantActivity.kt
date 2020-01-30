@@ -6,30 +6,31 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.TransitionManager
 import com.grantsutcliffe.restaurants.core.PresenterView
 import com.grantsutcliffe.restaurants.search.R
 import com.grantsutcliffe.restaurants.search.adapter.RestaurantAdapter
-import com.grantsutcliffe.restaurants.search.presenter.SearchAction
-import com.grantsutcliffe.restaurants.search.presenter.SearchPresenter
-import com.grantsutcliffe.restaurants.search.presenter.SearchUiEvent
+import com.grantsutcliffe.restaurants.search.presenter.*
+import com.grantsutcliffe.restaurants.search.viewmodel.RestaurantViewModel
 import com.grantsutcliffe.restaurants.search.viewmodel.SearchViewModel
 import dagger.android.AndroidInjection
 import io.reactivex.subjects.PublishSubject
+import kotlinx.android.synthetic.main.activity_restaurant.*
 import javax.inject.Inject
 
-class SearchActivity : AppCompatActivity(), PresenterView<SearchViewModel, SearchAction, SearchUiEvent> {
+class RestaurantActivity : AppCompatActivity(), PresenterView<RestaurantViewModel, RestaurantAction, RestaurantUiEvent> {
 
-    @Inject override lateinit var presenter: SearchPresenter
-    @Inject override lateinit var uiEvents: PublishSubject<SearchUiEvent>
-    @Inject lateinit var adapter: RestaurantAdapter
+    @Inject override lateinit var presenter: RestaurantPresenter
+    @Inject override lateinit var uiEvents: PublishSubject<RestaurantUiEvent>
 
+    private val idTextView by lazy { findViewById<TextView>(R.id.idTextView) }
     private val constraintLayout by lazy { findViewById<ConstraintLayout>(R.id.constraintLayout) }
-    private val recyclerView by lazy { findViewById<RecyclerView>(R.id.recyclerView) }
     private val tryAgainButton by lazy { findViewById<Button>(R.id.tryAgainButton) }
     private val progressBar by lazy { findViewById<ProgressBar>(R.id.progressBar) }
 
@@ -40,40 +41,32 @@ class SearchActivity : AppCompatActivity(), PresenterView<SearchViewModel, Searc
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
+        setContentView(R.layout.activity_restaurant)
 
-        initRecyclerView()
         initConstraints()
 
-        tryAgainButton.setOnClickListener { uiEvents.onNext(SearchUiEvent.TryAgainClicked) }
-    }
-
-    private fun initRecyclerView() {
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        tryAgainButton.setOnClickListener { uiEvents.onNext(RestaurantUiEvent.TryAgainClicked) }
     }
 
     private fun initConstraints() {
         loadingConstraintSet.clone(constraintLayout)
+        loadingConstraintSet.apply {
+            setVisibility(progressBar.id, ConstraintSet.VISIBLE)
+        }
 
         resultConstraintSet.clone(constraintLayout)
-        resultConstraintSet.apply {
-            setVisibility(recyclerView.id, ConstraintSet.VISIBLE)
-            setVisibility(progressBar.id, ConstraintSet.GONE)
-        }
 
         errorConstraintSet.clone(constraintLayout)
         errorConstraintSet.apply {
             setVisibility(tryAgainButton.id, ConstraintSet.VISIBLE)
-            setVisibility(progressBar.id, ConstraintSet.GONE)
         }
     }
 
-    override fun render(viewModel: SearchViewModel) {
+    override fun render(viewModel: RestaurantViewModel) {
         when (viewModel) {
-            is SearchViewModel.Loading -> renderLoading()
-            is SearchViewModel.Error -> renderError()
-            is SearchViewModel.Result -> renderResult(viewModel)
+            is RestaurantViewModel.Loading -> renderLoading()
+            is RestaurantViewModel.Error -> renderError()
+            is RestaurantViewModel.Result -> renderResult(viewModel)
         }
     }
 
@@ -87,30 +80,23 @@ class SearchActivity : AppCompatActivity(), PresenterView<SearchViewModel, Searc
         errorConstraintSet.applyTo(constraintLayout)
     }
 
-    private fun renderResult(viewModel: SearchViewModel.Result) {
+    private fun renderResult(viewModel: RestaurantViewModel.Result) {
         TransitionManager.beginDelayedTransition(constraintLayout)
         resultConstraintSet.applyTo(constraintLayout)
 
-        adapter.items = viewModel.restaurants
+        // TODO: Show restaurant details
+        idTextView.text = viewModel.restaurant.id
+        descriptionTextView.text = viewModel.restaurant.description
     }
 
-    override fun performAction(action: SearchAction) {
+    override fun performAction(action: RestaurantAction) {
         when (action) {
-            is SearchAction.Call -> handleCallAction(action.phoneNumberUri)
-            is SearchAction.ShowDetail -> handleShowDetailAction(action.id)
+            // No actions yet
         }
     }
 
-    private fun handleCallAction(phoneNumberUri: String) {
-        val intent = Intent(Intent.ACTION_DIAL)
-        intent.data = Uri.parse(phoneNumberUri)
-        startActivity(intent)
-    }
-
-    private fun handleShowDetailAction(id: String) {
-        val intent = Intent(this, RestaurantActivity::class.java)
-        intent.putExtra(RestaurantActivity.BUNDLE_ARG_RESTAURANT_ID, id)
-        startActivity(intent)
+    companion object {
+        const val BUNDLE_ARG_RESTAURANT_ID = "restaurantId"
     }
 }
 

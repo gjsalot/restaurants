@@ -15,6 +15,7 @@ import com.grantsutcliffe.restaurants.search.presenter.SearchUiEvent
 import com.squareup.picasso.Picasso
 import io.reactivex.subjects.PublishSubject
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation
+import kotlinx.android.synthetic.main.view_restaurant_item.view.*
 import kotlin.properties.Delegates
 
 class RestaurantAdapter(
@@ -26,20 +27,21 @@ class RestaurantAdapter(
     private val cardviewMargin = resources.getDimensionPixelOffset(R.dimen.cardview_margin)
 
     var items: List<RestaurantUI> by Delegates.observable(emptyList()) { _, oldItems, newItems ->
-        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-
-            override fun getOldListSize(): Int = oldItems.size
-
-            override fun getNewListSize(): Int = newItems.size
-
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-                oldItems[oldItemPosition].id == newItems[newItemPosition].id
-
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-                oldItems[oldItemPosition] == newItems[newItemPosition]
-        })
-
-        diffResult.dispatchUpdatesTo(this)
+//        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+//
+//            override fun getOldListSize(): Int = oldItems.size
+//
+//            override fun getNewListSize(): Int = newItems.size
+//
+//            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+//                oldItems[oldItemPosition].id == newItems[newItemPosition].id
+//
+//            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+//                oldItems[oldItemPosition] == newItems[newItemPosition]
+//        })
+//
+//        diffResult.dispatchUpdatesTo(this)
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int = items.size
@@ -65,9 +67,15 @@ class RestaurantAdapter(
                 .load(imageUrl)
                 .transform(RoundedCornersTransformation(imageCornerRadius, 0))
                 .into(imageView)
-            Picasso.get()
-                .load(iconUrl)
-                .into(iconImageView)
+            if (iconUrl == null) {
+                iconImageView.visibility = View.GONE
+            } else {
+                iconImageView.visibility = View.VISIBLE
+
+                Picasso.get()
+                    .load(iconUrl)
+                    .into(iconImageView)
+            }
             titleTextView.text = title
             subtitleTextView.text = subtitle
             categoriesTextView.text = categories
@@ -76,6 +84,12 @@ class RestaurantAdapter(
 
             itemView.layoutParams = (itemView.layoutParams as RecyclerView.LayoutParams).apply {
                 bottomMargin = if (adapterPosition == items.size - 1) cardviewMargin else 0
+            }
+
+            itemView.setOnClickListener { uiEvents.onNext(SearchUiEvent.RestaurantClicked(restaurantUI)) }
+
+            if (adapterPosition == itemCount - 1) {
+                uiEvents.onNext(SearchUiEvent.ScrolledToBottom)
             }
         }
 

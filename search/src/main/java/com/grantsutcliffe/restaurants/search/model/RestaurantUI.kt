@@ -8,7 +8,7 @@ data class RestaurantUI(
     val title: String,
     val subtitle: String,
     val imageUrl: String,
-    val iconUrl: String,
+    val iconUrl: String?,
     val phoneNumberUri: String,
     val categories: String
 ) {

@@ -44,7 +44,7 @@
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toEndOf="@id/imageView"
             app:layout_constraintTop_toTopOf="@id/titleTextView"
-            tools:background="#ff0000" />
+            tools:background="#ff0000"/>
 
         <TextView
             android:id="@+id/titleTextView"
